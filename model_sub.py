@@ -128,36 +128,6 @@ class KG_Manipulation(torch.nn.Module):
         self.action_scorer_linear_1_bi_input = linear_function(self.block_hidden_dim * 2, self.block_hidden_dim)
         self.action_scorer_linear_2 = linear_function(self.block_hidden_dim, 1)
 
-        # ----- ----- [Yunqiu Xu] following are useless in RL tasks
-#         # text encoder for pretraining tasks
-#         self.encoder_for_pretraining_tasks =  torch.nn.ModuleList(
-#                             [EncoderBlock(conv_num=self.encoder_conv_num, 
-#                                         ch_num=self.block_hidden_dim, 
-#                                         k=5, 
-#                                         block_hidden_dim=self.block_hidden_dim, 
-#                                         n_head=self.n_heads, 
-#                                         dropout=self.block_dropout) for _ in range(self.encoder_layers)])
-#         # command generation
-#         self.cmd_gen_attention = CQAttention(block_hidden_dim=self.block_hidden_dim, dropout=self.attention_dropout)
-#         self.cmd_gen_attention_prj = torch.nn.Linear(self.block_hidden_dim * 4, self.block_hidden_dim, bias=False)
-#         self.decoder = torch.nn.ModuleList([DecoderBlock(ch_num=self.block_hidden_dim, k=5, block_hidden_dim=self.block_hidden_dim, n_head=self.n_heads, dropout=self.block_dropout) for _ in range(self.decoder_layers)])
-#         self.tgt_word_prj = torch.nn.Linear(self.block_hidden_dim, self.word_vocab_size, bias=False)
-#         self.pointer_softmax = PointerSoftmax(input_dim=self.block_hidden_dim, hidden_dim=self.block_hidden_dim)
-#         # action prediction
-#         self.ap_attention = CQAttention(block_hidden_dim=self.block_hidden_dim, dropout=self.attention_dropout)
-#         self.ap_attention_prj = torch.nn.Linear(self.block_hidden_dim * 4, self.block_hidden_dim, bias=False)
-#         self.ap_self_attention = SelfAttention(self.block_hidden_dim * 3, self.n_heads, self.dropout)
-#         self.ap_linear_1 = torch.nn.Linear(self.block_hidden_dim * 3, self.block_hidden_dim)
-#         self.ap_linear_2 = torch.nn.Linear(self.block_hidden_dim, 1)
-#         # state prediction
-#         self.sp_attention = CQAttention(block_hidden_dim=self.block_hidden_dim, dropout=self.attention_dropout)
-#         self.sp_attention_prj = torch.nn.Linear(self.block_hidden_dim * 4, self.block_hidden_dim, bias=False)
-#         self.sp_self_attention = SelfAttention(self.block_hidden_dim * 3, self.n_heads, self.dropout)
-#         self.sp_linear_1 = torch.nn.Linear(self.block_hidden_dim * 3, self.block_hidden_dim)
-#         self.sp_linear_2 = torch.nn.Linear(self.block_hidden_dim, 1)
-#         # deep graph infomax
-#         self.dgi_discriminator = DGIDiscriminator(self.gcn_hidden_dims[-1])
-
     def embed(self, input_words):
         """
         word_ids --> word_embeddings
@@ -238,9 +208,6 @@ class KG_Manipulation(torch.nn.Module):
         tasks_encoding_sequence, tasks_mask = self.encode_text(input_tasks_word_ids)
         return tasks_encoding_sequence, tasks_mask
 
-#     def get_match_rep_graph_task(self, node_encodings, node_mask, tasks_encodings, tasks_mask):
-#         pass
-
     def score_actions(self, input_candidate_word_ids, h_og=None, obs_mask=None, h_go=None, node_mask=None, h_tasks=None, tasks_mask=None, previous_h=None, previous_c=None):
         """
         input_candidate_word_ids is from action candidates
@@ -293,19 +260,14 @@ class KG_Manipulation(torch.nn.Module):
         tasks_representations = tasks_representations / _mask.unsqueeze(-1)  # batch x hid
 
         # Step 3: decision making
-        if self.enable_recurrent_memory:
-            raise Exception("Does not allow recurrent memory!")
-#             new_h, new_c = self.recurrent_memory_bi_input(torch.cat([graph_representations, tasks_representations], -1), h_0=previous_h, c_0=previous_c)
-#             new_h_expanded = torch.stack([new_h] * num_candidate, 1).view(batch_size, num_candidate, new_h.size(-1))
-#             output = self.action_scorer_linear_1_bi_input(torch.cat([candidate_representations, new_h_expanded], -1))
-        else:
-            new_h, new_c = None, None
-            tasks_representations_expanded = torch.stack([tasks_representations] * num_candidate, 1).view(batch_size, num_candidate, tasks_representations.size(-1))
-            graph_representations_expanded = torch.stack([graph_representations] * num_candidate, 1).view(batch_size, num_candidate, graph_representations.size(-1))
-            output = self.action_scorer_linear_1_tri_input(torch.cat([candidate_representations, 
-                                                                      graph_representations_expanded,
-                                                                      tasks_representations_expanded], 
-                                                                      -1))
+        assert (not self.enable_recurrent_memory), "Does not allow recurrent memory!"
+        new_h, new_c = None, None
+        tasks_representations_expanded = torch.stack([tasks_representations] * num_candidate, 1).view(batch_size, num_candidate, tasks_representations.size(-1))
+        graph_representations_expanded = torch.stack([graph_representations] * num_candidate, 1).view(batch_size, num_candidate, graph_representations.size(-1))
+        output = self.action_scorer_linear_1_tri_input(torch.cat([candidate_representations, 
+                                                                  graph_representations_expanded,
+                                                                  tasks_representations_expanded], 
+                                                                  -1))
         # Step 4: final output [batch x num_candidate x hid] -> [batch x num_candidate]
         output = torch.relu(output)
         output = output * cand_mask.unsqueeze(-1)
@@ -313,50 +275,4 @@ class KG_Manipulation(torch.nn.Module):
         output = output * cand_mask
         return output, cand_mask, new_h, new_c
 
-#     def reset_noise(self):
-#         if self.noisy_net:
-#             self.action_scorer_linear_1_bi_input.reset_noise()
-#             self.action_scorer_linear_1_tri_input.reset_noise()
-#             self.action_scorer_linear_2.reset_noise()
-
-#     def zero_noise(self):
-#         if self.noisy_net:
-#             self.action_scorer_linear_1_bi_input.zero_noise()
-#             self.action_scorer_linear_1_tri_input.zero_noise()
-#             self.action_scorer_linear_2.zero_noise()
-
-# ----- ----- [Yunqiu Xu] decode, useless in RL!
-#     def get_subsequent_mask(self, seq):
-#         ''' For masking out the subsequent info. '''
-#         _, length = seq.size()
-#         subsequent_mask = torch.triu(torch.ones((length, length)), diagonal=1).float()
-#         subsequent_mask = 1.0 - subsequent_mask
-#         if seq.is_cuda:
-#             subsequent_mask = subsequent_mask.cuda()
-#         subsequent_mask = subsequent_mask.unsqueeze(0)  # 1 x time x time
-#         return subsequent_mask
-
-#     def decode(self, input_target_word_ids, h_og, obs_mask, h_go, node_mask, input_obs):
-#         trg_embeddings, trg_mask = self.embed(input_target_word_ids)  # batch x target_len x emb
-#         trg_mask_square = torch.bmm(trg_mask.unsqueeze(-1), trg_mask.unsqueeze(1))  # batch x target_len x target_len
-#         trg_mask_square = trg_mask_square * self.get_subsequent_mask(input_target_word_ids)  # batch x target_len x target_len
-#         obs_mask_square = torch.bmm(trg_mask.unsqueeze(-1), obs_mask.unsqueeze(1))  # batch x target_len x obs_len
-#         node_mask_square = torch.bmm(trg_mask.unsqueeze(-1), node_mask.unsqueeze(1))  # batch x target_len x node_len
-#         trg_decoder_output = trg_embeddings
-#         for i in range(self.decoder_layers):
-#             trg_decoder_output, target_target_representations, target_source_representations, target_source_attention = self.decoder[i](trg_decoder_output, trg_mask, trg_mask_square, h_og, obs_mask_square, h_go, node_mask_square, i * 3 + 1, self.decoder_layers)  # batch x time x hid
-#         trg_decoder_output = self.tgt_word_prj(trg_decoder_output)
-#         trg_decoder_output = masked_softmax(trg_decoder_output, m=trg_mask.unsqueeze(-1), axis=-1)
-#         output = self.pointer_softmax(target_target_representations, target_source_representations, trg_decoder_output, trg_mask, target_source_attention, obs_mask, input_obs)
-#         return output
-            
-# ----- ----- [Yunqiu Xu] useless in RL
-#     def get_deep_graph_infomax_discriminator_input(self, node_embeddings, shuffled_node_embeddings, node_masks, relation_embeddings, adjacency_matrix):
-#         h_positive = self.rgcns(node_embeddings, relation_embeddings, adjacency_matrix)
-#         h_positive = h_positive * node_masks.unsqueeze(-1)  # batch x num_node x hid
-#         h_negative = self.rgcns(shuffled_node_embeddings, relation_embeddings, adjacency_matrix)
-#         h_negative = h_negative * node_masks.unsqueeze(-1)  # batch x num_node x hid
-#         global_representations = masked_mean(h_positive, node_masks, dim=1)  # batch x hid
-#         global_representations = torch.sigmoid(global_representations)  # batch x hid
-#         return h_positive, h_negative, global_representations
 
