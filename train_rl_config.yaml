@@ -70,21 +70,21 @@ general:
     attention_dropout: 0.
     block_dropout: 0.
 
-cmd_gen:
-  data_path: "cmd_gen.0.2"
-ap:
-  data_path: "ap.0.2"
-  graph_type: "full"  
-  k_way_classification: -1  # -1 means all
-sp:
-  data_path: "sp.0.2"
-  graph_type: "full"  
-  k_way_classification: -1  # -1 means all
-dgi:
-  data_path: "dgi.0.2"
-  graph_type: "full" 
-  sample_bias_positive: 0.0
-  sample_bias_negative: 0.0
+# cmd_gen:
+#   data_path: "cmd_gen.0.2"
+# ap:
+#   data_path: "ap.0.2"
+#   graph_type: "full"  
+#   k_way_classification: -1  # -1 means all
+# sp:
+#   data_path: "sp.0.2"
+#   graph_type: "full"  
+#   k_way_classification: -1  # -1 means all
+# dgi:
+#   data_path: "dgi.0.2"
+#   graph_type: "full" 
+#   sample_bias_positive: 0.0
+#   sample_bias_negative: 0.0
 
 rl:
   data_path: "rl.0.1"
