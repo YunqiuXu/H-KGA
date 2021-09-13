@@ -5,7 +5,8 @@
 
 This repository contains official implementation for our paper: 
 
-Generalization in Text-based Games via Hierarchical Reinforcement Learnin
+Generalization in Text-based Games via Hierarchical Reinforcement Learning
+
 Yunqiu Xu, Meng Fang, Ling Chen, Yali Du and Chengqi Zhang
 
 ## Dependencies
