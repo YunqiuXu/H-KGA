@@ -1,0 +1,9 @@
+gym                       0.15.7                   pypi_0    pypi
+h5py                      2.10.0           py37h7918eee_0  
+jericho                   2.4.0                    pypi_0    pypi
+nltk                      3.5                        py_0    anaconda
+numpy                     1.20.2           py37h2d18471_0  
+python                    3.7.7                hcff3b4d_5  
+pytorch                   1.4.0           py3.7_cuda10.1.243_cudnn7.6.3_0    pytorch
+spacy                     2.3.0            py37h99015e2_0    conda-forge
+textworld                 1.3.2                    pypi_0    pypi
