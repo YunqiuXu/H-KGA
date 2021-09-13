@@ -44,4 +44,4 @@ arxiv link
 
 ## License
 
-[MIT License](https://github.com/YunqiuXu/SHA-KG/blob/main/LICENSE)
+[MIT License](LICENSE)
