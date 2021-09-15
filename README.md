@@ -11,7 +11,7 @@ Yunqiu Xu, Meng Fang, Ling Chen, Yali Du and Chengqi Zhang
 
 ## Dependencies
 
-Our code depends heavily on [xingdi-eric-yuan/GATA-public](https://github.com/xingdi-eric-yuan/GATA-public) for providing the excellent codebase. Specifically, we use the version [413a262](https://github.com/YunqiuXu/GATA-public). The requirements could be found at [requirements.txt](requirements.txt).
+Our code depends heavily on [xingdi-eric-yuan/GATA-public](https://github.com/xingdi-eric-yuan/GATA-public). Specifically, we use the version [413a262](https://github.com/YunqiuXu/GATA-public). The requirements could be found at [requirements.txt](requirements.txt).
 
 ## How to train
 
