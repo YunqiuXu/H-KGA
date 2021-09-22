@@ -5,7 +5,7 @@
 
 This repository contains official implementation for our paper: 
 
-Generalization in Text-based Games via Hierarchical Reinforcement Learning
+[Generalization in Text-based Games via Hierarchical Reinforcement Learning](http://arxiv.org/abs/2109.09968)
 
 Yunqiu Xu, Meng Fang, Ling Chen, Yali Du and Chengqi Zhang
 
@@ -39,7 +39,12 @@ python train_rl.py train_rl_config.yaml
 ## Citation
 
 ```
-arxiv link
+@article{xu2021hierarchical,
+  title={Generalization in Text-based Games via Hierarchical Reinforcement Learning},
+  author={Xu, Yunqiu and Fang, Meng and Chen, Ling and Du, Yali and Zhang, Chengqi},
+  journal={arXiv preprint arXiv:2109.09968},
+  year={2021}
+}
 ```
 
 ## License
